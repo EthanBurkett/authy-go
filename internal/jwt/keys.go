@@ -5,23 +5,27 @@ import (
 	"crypto/rsa"
 	"encoding/base64"
 	"sync"
+	"time"
 )
 
 type Key struct {
 	ID         string
 	PrivateKey *rsa.PrivateKey
 	PublicKey  *rsa.PublicKey
+	CreatedAt  time.Time
 }
 
 type KeyStore struct {
-	mu   sync.RWMutex
-	keys map[string]*Key
-	curr *Key
+	mu     sync.RWMutex
+	keys   map[string]*Key
+	curr   *Key
+	maxAge time.Duration
 }
 
-func NewKeyStore() *KeyStore {
+func NewKeyStore(maxAge time.Duration) *KeyStore {
 	ks := &KeyStore{
-		keys: make(map[string]*Key),
+		keys:   make(map[string]*Key),
+		maxAge: maxAge,
 	}
 	ks.Rotate()
 	return ks
@@ -35,12 +39,28 @@ func (ks *KeyStore) Rotate() {
 		ID:         kid,
 		PrivateKey: key,
 		PublicKey:  &key.PublicKey,
+		CreatedAt:  time.Now(),
 	}
 
 	ks.mu.Lock()
 	defer ks.mu.Unlock()
 	ks.keys[kid] = k
 	ks.curr = k
+
+	ks.pruneOldKeys()
+}
+
+func (ks *KeyStore) pruneOldKeys() {
+	if ks.maxAge == 0 {
+		return
+	}
+
+	cutoff := time.Now().Add(-ks.maxAge)
+	for id, key := range ks.keys {
+		if key.CreatedAt.Before(cutoff) && key != ks.curr {
+			delete(ks.keys, id)
+		}
+	}
 }
 
 func (ks *KeyStore) Current() *Key {

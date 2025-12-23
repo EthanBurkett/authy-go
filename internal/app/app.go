@@ -10,14 +10,12 @@ import (
 )
 
 func New() {
-	// Load config
 	cfg, err := config.Load("configs/config.local.yaml")
 	if err != nil {
 		log.Fatalf("failed to load config: %v", err)
 	}
 
-	// Initialize KeyStore and JWT service
-	ks := jwt.NewKeyStore()
+	ks := jwt.NewKeyStore(48 * time.Hour)
 	jwtService := jwt.NewJWTService(ks, jwt.JWTConfig{
 		Issuer:         cfg.JWT.Issuer,
 		Audience:       cfg.JWT.Audience,
@@ -25,6 +23,18 @@ func New() {
 	})
 
 	jwksCache := jwt.NewJWKSCache("http://localhost:8080/.well-known/jwks.json", 5*time.Minute)
+
+	go func() {
+		ticker := time.NewTicker(24 * time.Hour)
+		defer ticker.Stop()
+		for range ticker.C {
+			log.Println("Rotating KeyStore keys...")
+			ks.Rotate()
+			if err := jwksCache.Refresh(); err != nil {
+				log.Println("Failed to refresh JWKS cache after rotation:", err)
+			}
+		}
+	}()
 
 	http.HandleFunc("/login", func(w http.ResponseWriter, r *http.Request) {
 		userData := map[string]interface{}{
