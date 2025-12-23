@@ -1,0 +1,95 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.so.*
+*.dylib
+bin/
+dist/
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool
+*.out
+coverage-*.out
+coverage-*.html
+
+# Dependency directories (remove the comment below to include it)
+vendor/
+
+# Go workspace file
+go.work
+
+# IDE and Editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*~
+.DS_Store
+*.iml
+*.sublime-project
+*.sublime-workspace
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Air - live reload
+tmp/
+build-errors.log
+
+# OS files
+Thumbs.db
+.DS_Store
+*.pid
+
+# Local development files
+*.local
+config.local.yaml
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+*.db-journal
+
+# Generated files
+*.proto.go
+
+# Build artifacts
+./cmd/api/main
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*.tmp
+*.bak
+*.backup
+
+# macOS
+.AppleDouble
+.LSOverride
+._*
+.Spotlight-V100
+.Trashes
+
+# Linux
+.Xauthority
+.bash_history
+
+# Windows
+desktop.ini
+$RECYCLE.BIN/
+
+# Private keys and secrets
+*.pem
+*.key
+private/
+secrets/

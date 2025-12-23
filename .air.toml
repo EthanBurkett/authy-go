@@ -1,0 +1,21 @@
+# .air.toml (Windows)
+
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd = "go build -o tmp\\authy.exe cmd\\authy\\main.go"
+  bin = "tmp\\authy.exe"
+  delay = 1000
+  exclude_dir = ["tmp", "vendor", ".git"]
+  include_ext = ["go"]
+  stop_on_error = true
+
+[log]
+  time = true
+
+[color]
+  main = "yellow"
+  watcher = "cyan"
+  build = "green"
+  runner = "magenta"

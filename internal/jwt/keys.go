@@ -29,7 +29,6 @@ func NewKeyStore() *KeyStore {
 
 func (ks *KeyStore) Rotate() {
 	key, _ := rsa.GenerateKey(rand.Reader, 2048)
-
 	kid := randomID()
 
 	k := &Key{
@@ -40,7 +39,6 @@ func (ks *KeyStore) Rotate() {
 
 	ks.mu.Lock()
 	defer ks.mu.Unlock()
-
 	ks.keys[kid] = k
 	ks.curr = k
 }
@@ -54,17 +52,15 @@ func (ks *KeyStore) Current() *Key {
 func (ks *KeyStore) AllPublic() []*Key {
 	ks.mu.RLock()
 	defer ks.mu.RUnlock()
-
 	out := make([]*Key, 0, len(ks.keys))
 	for _, k := range ks.keys {
 		out = append(out, k)
 	}
-
 	return out
 }
 
 func randomID() string {
 	b := make([]byte, 16)
 	rand.Read(b)
-	return base64.URLEncoding.EncodeToString(b)
+	return base64.RawURLEncoding.EncodeToString(b)
 }
